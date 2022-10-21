@@ -29,7 +29,7 @@ conda install ipykernel -y
 
 Sktime is at least on par with fable in terms of the reconciliation methods which was our goal at the start.
 There are some minor differences between the methods that use the residual covariance matrix, due to how they are calculated under the hood.
-Note, results with * indicate there is probably a problem with the empricical residual covariance matrix. There is a bug in the top down reconciliation method in fable which has kindly already been reported [here](https://github.com/tidyverts/fable/issues/370) by the folks from Nixtla. The forecasts are evaluated using RMSE.
+Note, results with * indicate there is probably a problem with the empirical residual covariance matrix. There is a bug in the top down reconciliation method in fable which has kindly already been reported [here](https://github.com/tidyverts/fable/issues/370) by the folks from Nixtla. The forecasts are evaluated using RMSE.
 
 
 ##### Tourism Data
