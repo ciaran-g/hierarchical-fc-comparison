@@ -20,7 +20,8 @@ conda install ipykernel -y
 
 The forecasts are evaluated using RMSE.
 
-| Synthetic dataset                         |
+| Synthetic data |             |            |
+|----------------|-------------|------------|
 | Model          | Sktime      | Fable      |
 |----------------|-------------|------------|
 | base           |  2601.781   | 2601.781   |
