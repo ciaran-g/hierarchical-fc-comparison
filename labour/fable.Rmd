@@ -1,0 +1,163 @@
+---
+title: "Fable - hierarchical forecasting with labour data"
+author: "Ciaran Gilbert"
+date: "`r format(Sys.Date(),'%d-%m-%Y')`"
+output:
+  html_document:
+    code_folding: show
+    theme: united
+    number_sections: yes
+    toc: yes
+  pdf_document:
+    toc: yes
+---
+
+<style>
+.main-container {
+    max-width: 1200px !important;
+}
+pre {
+  overflow-x: auto;
+}
+pre code {
+  word-wrap: normal;
+  white-space: pre;
+}
+</style>
+
+```{r set-options, echo=FALSE, cache=FALSE}
+options(width = 800)
+```
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+First some required packages
+
+
+```{r message=FALSE, warning=FALSE, results='hide'}
+
+packages <- c("fpp3", "data.table")
+
+
+install.packages(setdiff(packages, rownames(installed.packages())))
+
+rm(list=ls())
+
+library(fpp3)
+library(data.table)
+
+```
+First let's load the data
+
+```{r}
+
+cutoff <- yearmonth('2019-04-01')
+y <- fread("./data/hierarchical/labour_bottomlevels.csv")
+y[,ds:=yearmonth(ds)]
+y
+
+
+```
+
+
+Convert to a tsibble
+
+```{r}
+
+y_bl <- as_tsibble(y, key = c('Region', 'Employment', 'Gender'), index = ds)
+y_bl
+
+
+```
+
+Test out aggregation function
+
+```{r}
+
+
+y_bl %>%
+  # Specify hierarchy
+  aggregate_key(Region / Employment / Gender, value = sum(y))
+
+
+
+```
+
+
+Make the hierarchical forecasts
+
+* note top down proportions was giving me an error
+
+```{r}
+
+
+
+fcsts <- y_bl %>%
+  filter(ds <= cutoff) %>%
+  # Specify hierarchy
+  aggregate_key(Region / Employment / Gender, value = sum(y)) %>%
+  # Fit models
+  model(base_fc = AR(value ~ 0 + order(p=1))) %>%
+      # Set up reconciliation
+    mutate(bu = bottom_up(base_fc),
+           ols = min_trace(base_fc, method="ols"),
+           wls_str = min_trace(base_fc, method = "wls_struct"),
+           # td_fcst = top_down(base_fc, method = "forecast_proportions"),
+           mint_cov = min_trace(base_fc, method = "mint_cov"),
+           mint_shrink = min_trace(base_fc, method = "mint_shrink"),
+           wls_var = min_trace(base_fc, method = "wls_struct")) %>%
+    # Produce the forecasts
+    forecast(h = 8)
+
+
+fcsts
+
+```
+
+Now combine with test data 
+
+```{r}
+y_test <-y_bl %>%
+  filter(ds > cutoff) %>%
+  aggregate_key(Region / Employment / Gender, value = sum(y))
+
+fcsts <- fcsts %>%
+  as_tibble() %>%
+  select(-value) %>%
+  left_join(y_test, by=c('Region', 'Employment', 'Gender', 'ds'))
+
+
+fcsts
+```
+
+Calculate the RMSE
+
+```{r}
+
+errors <- fcsts %>%
+  mutate(error = (value - .mean) ** 2) %>%
+  group_by_at(c('.model')) %>%
+  summarise(rmse = sqrt(mean(error)))
+
+names(errors$rmse) <- errors$.model
+round(errors$rmse, 3)
+
+
+```
+
+
+
+```{r}
+
+sessionInfo()
+
+
+```
+
+
+
+
+
+

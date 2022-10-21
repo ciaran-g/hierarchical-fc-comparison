@@ -1,0 +1,4 @@
+labour/data/*
+synthetic/data/**
+!synthetic/data/**/
+!synthetic/data/.gitkeep
