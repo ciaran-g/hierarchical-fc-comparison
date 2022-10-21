@@ -1,11 +1,17 @@
 # sktime-fable-hierarchical forecasting experiement
 
-Here the plan is to use both a real world dataset (labour) and a synethic data set to compare the hierachical forecasting results from sktime (python) and fable (R).
+Here the plan is to use both a real world dataset (labour) and a synthetic data set to compare the hierachical forecasting results from sktime (python) and fable (R).
 
-The goal is to compare the sktime **hierarchical** implementation is consistent with the fable one. Therefore we will use a simple and consistent base forecaster across the two libraries.
+The goal is to ensure the sktime **hierarchical** implementation is consistent with the fable one. Therefore we will use a simple and consistent base forecaster across the two libraries.
 
 
 #### Environment
+
+To reproduce the results, the environment can be recreated as follows.
+
+Please run the python notebooks before the R ones for each experiment :)
+
+
 ```
 conda create -n sktime_hier python=3.7 -y
 conda activate sktime_hier
@@ -17,16 +23,15 @@ conda install ipykernel -y
 ```
 
 
-#### Results
+#### Overall Results
 
-Overall we can see that sktime is at least on par with fable in terms of the reconciliation methods which was our goal at the start.
-There are some minor differences between the methods that use the residual covariance matrix, due to how they are calculated.
-Note, results with * indicate there is probably a problem with the empricical residual covariance matrix. There is a bug in the top down reconciliation method in fable which has kindly already been reported [here](https://github.com/tidyverts/fable/issues/370) by the folks from Nixtla
+Sktime is at least on par with fable in terms of the reconciliation methods which was our goal at the start.
+There are some minor differences between the methods that use the residual covariance matrix, due to how they are calculated under the hood.
+Note, results with * indicate there is probably a problem with the empricical residual covariance matrix. There is a bug in the top down reconciliation method in fable which has kindly already been reported [here](https://github.com/tidyverts/fable/issues/370) by the folks from Nixtla. The forecasts are evaluated using RMSE.
 
 
-#### Tourism Data Results
+##### Tourism Data
 
-The forecasts are evaluated using RMSE.
 
 
 | Model          | Sktime      | Fable      |
@@ -41,7 +46,7 @@ The forecasts are evaluated using RMSE.
 | wls_var        |  17.573     | 17.614     |
 
 
-#### Synthetic Data Results
+##### Synthetic Data
 
 The forecasts are evaluated using RMSE.
 
