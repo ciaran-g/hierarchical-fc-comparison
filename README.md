@@ -11,6 +11,8 @@ To reproduce the results, the environment can be recreated as follows.
 
 Please run the python notebooks before the R ones for each experiment :)
 
+If you don't want to re-run it, the output is saved as a .html file which can be loaded up in a browser.
+
 
 ```
 conda create -n sktime_hier python=3.7 -y
